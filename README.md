@@ -1,4 +1,4 @@
-# tiynML_ESP
+# tiynML_ESP Project
 
 Proyecto de desarrollo de ingeniería para un clasificador acústico embebido basado en TinyML sobre plataformas ESP32/ESP-IDF con FreeRTOS, I2S, DMA, PSRAM, DSP y inferencia local con redes neuronales.
 
