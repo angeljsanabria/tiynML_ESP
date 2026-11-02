@@ -1,0 +1,37 @@
+---
+description: Estacion de desarrollo embebida completa (toolchain C, CMake, Ninja, IDF). Prohibido documentar solo el plugin del IDE.
+alwaysApply: true
+---
+
+# Entorno de build embebido — cadena completa
+
+Al documentar, planificar o explicar instalacion/setup de firmware (ESP-IDF, baremetal, STM32, etc.):
+
+## Obligatorio
+
+Incluir el mapa completo, no solo el IDE:
+
+1. **Host**: SO, Git, Python del sistema, prerrequisitos del SO, permisos del puerto serie.
+2. **Generadores de build**: CMake (y Ninja u otro backend). Que archivo los invoca (`CMakeLists.txt`, `idf.py`).
+3. **Toolchain cruzado**: compilador del **target** (p. ej. `riscv32-esp-elf-gcc`), distinto del `gcc` del host.
+4. **SDK/framework**: ESP-IDF u otro; rutas `IDF_PATH` / equivalentes; version fijada (no solo "latest").
+5. **Flash/debug**: esptool, OpenOCD/GDB si aplica.
+6. **IDE**: VS Code + extension Espressif **y** extension de lenguaje C/C++ (o clangd). El plugin orquesta; no compila solo.
+7. **Verificacion**: comandos concretos (`cmake --version`, `ninja --version`, `*-elf-gcc --version`, `idf.py --version`, Doctor) y criterio de salida medible.
+8. **Python de ML** (si hay TinyML): venv separado del Python del SDK.
+9. **Si hay contenedor (Compose / Dev Container)**: es la config dorada de IDF+target; anclar tag de imagen, `IDF_TARGET` y **revision de silicio** del chip (P4 antiguo != P4 generico). Host e imagen deben coincidir en version; no reinstalar IDF por cada ejemplo.
+
+## Prohibido
+
+- Listas del estilo "instala VS Code y el plugin ESP" sin CMake, Ninja ni toolchain.
+- Tratar la extension del IDE como si fuera el entorno de compilacion.
+- Mezclar dependencias del venv de ML con el Python de IDF/SDK.
+
+## Forma
+
+Tabla o lista de responsabilidades (quien aporta cada pieza) + pasos de instalacion + checklist de cierre versionado (p. ej. `docs/environment.md`).
+
+## Ejemplo corto
+
+- Mal: "Instalar extension ESP-IDF y buildear."
+- Bien: "Installation Manager instala CMake, Ninja, toolchain RISC-V y venv de IDF; la extension solo enlaza esas tools; verificar con `cmake`/`ninja`/`riscv32-esp-elf-gcc`/`idf.py` antes del primer flash."
