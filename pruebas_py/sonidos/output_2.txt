@@ -1,0 +1,2 @@
+muestras: 16000
+frecuencia del pico: 440.0

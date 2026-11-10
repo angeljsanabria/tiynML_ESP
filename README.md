@@ -69,7 +69,7 @@ El paso final es inyectar la inteligencia. El modelo TinyML toma la matriz matem
   2. Inserta los archivos en la estructura de directorios de tu proyecto de ESP-IDF dentro de VS Code, adaptando el archivo de configuración de compilación `CMakeLists.txt` para incluir los nuevos archivos fuente.
   3. Asegúrate de enlazar el componente nativo de Espressif `esp-nn` en el SDK de configuración (`menuconfig`). Esto activa las extensiones vectoriales físicas del procesador de la FireBeetle, logrando que los cálculos convolucionales pesados se resuelvan en apenas un par de milisegundos.
   4. Alimenta la función de inferencia con la matriz calculada en la Fase 4.
-  5. Escribe la lógica de salida industrial por la UART utilizando `ESP_LOGI` para imprimir únicamente la etiqueta del estado detectado junto con su nivel de certeza flotante: `[CLASE: TECLADO_RAPIDO] [CONFIANZA: 0.94]`.
+  5. Escribe la lógica de salida industrial por la UART utilizando `ESP_LOGI` para imprimir únicamente la etiqueta del estado detectado junto con su nivel de certeza flotante. Las etiquetas son `PARCHE`, `ANILLO` y `AMBIENTE`. Ejemplo: `[CLASE: ANILLO] [CONFIANZA: 0.94]`.
 - Métrica de Validación: El sistema completo debe correr de manera continua en tiempo real, arrojando predicciones por la UART con una latencia de inferencia menor a los 30 milisegundos y una precisión superior al 85%.
 
 ## Estructura sugerida del proyecto

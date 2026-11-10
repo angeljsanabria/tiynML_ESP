@@ -7,7 +7,7 @@ El firmware, la placa, FreeRTOS, I2S, DMA y PSRAM se implementan en [plan.md](pl
 **Aplicación:** clasificar eventos acústicos con el mismo contrato de datos del sistema embebido.  
 **Audio:** PCM mono, 16 bits con signo, little-endian, 16 000 Hz.  
 **Entorno:** conda en PowerShell de Windows, nombre `tinyml`, Python 3.12. El ejecutable tiene que ser el de `envs\tinyml`.  
-**Clases iniciales:** palmas, golpes sobre una mesa y ruido ambiente.
+**Clases iniciales:** golpe al parche del bombo legüero, golpe al anillo y sonido ambiente.
 
 El trabajo avanza por etapas. Cada etapa produce un resultado verificable. Lo ya ejecutado se anota en [python/docs/avance.md](python/docs/avance.md). Una librería entra en el entorno si su salida es un archivo que [plan.md](plan.md) va a leer, o si queda marcada como herramienta solo de PC y el contrato que viaja es ese archivo.
 
@@ -189,7 +189,7 @@ Equivale al disparo de grabación y al formato de la captura. El comando se empa
 **Lectura de validación.**
 
 - Un golpe o una palmada se reconoce al escuchar. Estática continua deja la toma fuera del conjunto de entrenamiento.
-- El silencio se ve uniforme en el espectrograma. Una palmada o un golpe aparece como una barra vertical breve. El ruido ambiente se ve estable a lo largo del tiempo.
+- El silencio se ve uniforme en el espectrograma. Un golpe al parche o al anillo aparece como una barra vertical. El sonido ambiente se ve estable a lo largo del tiempo.
 
 **Entregables.** `python/docs/audio_capture.md`, las figuras y la lista de tomas aceptadas y rechazadas, con el motivo. Esa lista es la que la etapa 3 de [plan.md](plan.md) puede volver a escuchar en Audacity sobre los mismos `.raw`.
 
@@ -204,7 +204,7 @@ Equivale al disparo de grabación y al formato de la captura. El comando se empa
 - Sobreajuste, subajuste y fuga entre particiones.
 - Accuracy, precision, recall, F1 y matriz de confusión. La métrica principal depende del costo de cada error.
 
-**Conjunto.** Tres clases: palmas, golpes sobre una mesa y ruido ambiente. El conjunto queda cerrado por escrito antes de etiquetar. El tecleo y otros sonidos de escucha permanecen fuera de estas tres clases hasta que se reabra el conjunto y se rehacen las particiones.
+**Conjunto.** Tres clases del bombo legüero: golpe al parche, golpe al anillo y sonido ambiente. El conjunto queda cerrado por escrito antes de etiquetar. Otro golpe o el tecleo permanecen fuera de estas tres clases hasta que se reabra el conjunto y se rehacen las particiones.
 
 **Práctica.**
 
@@ -291,7 +291,7 @@ Esta etapa junta el preprocesamiento, el `.tflite` y el avance en muestras. Es e
 **Trabajo.**
 
 1. Una función recibe un bloque PCM int16 y devuelve la etiqueta y la confianza. Las características son el código de la etapa 4. El modelo es el `.tflite` de la etapa 6.
-2. El formato de salida es el del plan completo: `[CLASE: PALMAS] [CONFIANZA: 0.94]`. Los nombres son los del conjunto cerrado en la etapa 3.
+2. El formato de salida es el del plan completo: `[CLASE: PARCHE] [CONFIANZA: 0.94]`. Los nombres son los del conjunto cerrado en la etapa 3: `PARCHE`, `ANILLO` y `AMBIENTE`.
 3. Sobre una grabación larga, avanzar de a `hop_samples`. El búfer se mide en muestras. Contar ventanas recibidas, procesadas y descartadas. El descarte ocurre cuando el procesamiento de una ventana supera el tiempo que ocupa el salto a 16 000 Hz.
 4. Imprimir la matriz de características en texto: un símbolo denso donde hay energía y espacio donde hay silencio.
 5. Medir en la PC el tiempo de características y el tiempo del intérprete, por separado. Esos tiempos quedan rotulados como tiempos de PC.
@@ -354,7 +354,7 @@ python/
 | Intérprete de esta copia | Etapa 0, paso 0 | PowerShell de Windows. Conda, entorno `tinyml`, Python 3.12, ejecutable en `envs\tinyml` |
 | Versiones y rol de cada librería | Etapa 0 | La sección 2 es la lista. Una librería nueva se instala en `tinyml` y se agrega ahí antes de usarla |
 | Layout del comando y duración de una toma | Etapa 1 | El PCM ya es mono, int16, little-endian, 16 000 Hz |
-| Conjunto de clases | Etapa 3 | Palmas, golpe de mesa, ruido ambiente |
+| Conjunto de clases | Etapa 3 | Parche del bombo legüero, anillo y ambiente |
 | Representación, muestras de ventana, salto y longitud de FFT | Etapa 4 | Ventana de análisis de 30 ms con solape, FFT en una potencia de 2 |
 | Modelo que se cuantiza | Etapa 5 | La línea de base es scikit-learn. El archivo que sigue es un modelo Keras del conjunto de capas de esa etapa |
 | Tolerancia entre float y cuantizado, y lista de operadores | Etapa 6 | Se escribe antes de comparar predicciones |

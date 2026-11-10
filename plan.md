@@ -198,7 +198,7 @@ Esta etapa no está en las cinco fases del README. Sin ella, la inferencia de la
 - Regresión logística, SVM y red neuronal como familias distintas. Pérdida, optimización y umbral de decisión.
 - Accuracy, precision, recall, F1 y matriz de confusión. La métrica principal depende del costo de cada error.
 
-**Conjunto inicial.** Tres clases: palmas, golpes sobre una mesa y ruido ambiente. El tecleo, el golpe de puerta y el golpe de madera de la etapa 3 siguen como banco de escucha. Si más adelante entran al conjunto de clases, se etiquetan de nuevo y se rehacen las particiones. El conjunto queda cerrado por escrito antes de etiquetar.
+**Conjunto inicial.** Tres clases del bombo legüero: golpe al parche, golpe al anillo y sonido ambiente. El tecleo, el golpe de puerta y el golpe de madera siguen como banco de escucha y no son clases. Si más adelante entran al conjunto, se etiquetan de nuevo y se rehacen las particiones. El conjunto queda cerrado por escrito antes de etiquetar.
 
 **Práctica.** Etiquetar grabaciones, armar las tres particiones sin mezclar ventanas de la misma toma, entrenar un clasificador simple con características provisionales y revisar los errores uno por uno.
 
@@ -295,7 +295,7 @@ Corresponde a la fase 5 del README.
 1. Si el runtime es ESP-TFLite-Micro, partir del ejemplo Micro Speech ya compilado en la etapa 7 y sustituir el modelo por el convertido.
 2. Si el runtime es código C exportado, incorporar `.c` y `.h` al árbol ESP-IDF y actualizar `CMakeLists.txt`. Activar `esp-nn` en `menuconfig`.
 3. Alimentar la inferencia con la matriz de la etapa 8.
-4. Publicar por UART, con `ESP_LOGI`, solo la etiqueta y la confianza. Formato de referencia: `[CLASE: TECLADO_RAPIDO] [CONFIANZA: 0.94]`. Los nombres de clase son los del conjunto cerrado en la etapa 4.
+4. Publicar por UART, con `ESP_LOGI`, solo la etiqueta y la confianza. Formato de referencia: `[CLASE: PARCHE] [CONFIANZA: 0.94]`. Los nombres de clase son los del conjunto cerrado en la etapa 4: `PARCHE`, `ANILLO` y `AMBIENTE`.
 5. Medir tiempo de inferencia y memoria. Comparar salidas contra el modelo convertido en la PC, con los mismos vectores.
 
 **Entregables.** Firmware que infiere, registro de predicciones y primer benchmark de latencia y memoria.
@@ -386,7 +386,7 @@ tiynML_ESP/
 | Decisión | Cuándo | Mientras tanto |
 | --- | --- | --- |
 | Revisión de la DFR1172 y versiones de ESP-IDF y bibliotecas | Etapa 0 | No se integra un ejemplo nuevo |
-| Conjunto de clases | Etapa 4 | Tres clases iniciales: palmas, golpe de mesa, ruido ambiente |
+| Conjunto de clases | Etapa 4 | Parche del bombo legüero, anillo y ambiente |
 | Representación y parámetros (ventana, salto, bandas) | Etapa 5 | Ventanas de 30 ms con solape como punto de partida |
 | Runtime: C exportado + `esp-nn`, o ESP-TFLite-Micro | Etapa 7 | Los dos se consideran hasta que un ejemplo compile en la placa |
 | Tolerancia numérica Python/C | Etapa 8 | Se escribe antes de comparar vectores |

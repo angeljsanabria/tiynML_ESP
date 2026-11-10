@@ -32,6 +32,7 @@ El archivo es `pruebas_py/requirements.txt`. Se instala desde `pruebas_py` con `
 | --- | --- | --- |
 | numpy | 2.5.4 | `pruebas_py/3_firma_process_2.py`, FFT de un `.raw` |
 | matplotlib | 3.11.2 | `pruebas_py/4_forma_process_3.py`, forma de onda de un `.raw` |
+| ipykernel | 7.4.0 | `pruebas_py/firma.ipynb`, para abrir la notebook con el Python de `tinyml`. Solo corre en la PC |
 
 ## Firmware
 
