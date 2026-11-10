@@ -6,10 +6,10 @@ El firmware, la placa, FreeRTOS, I2S, DMA y PSRAM se implementan en [plan.md](pl
 
 **Aplicación:** clasificar eventos acústicos con el mismo contrato de datos del sistema embebido.  
 **Audio:** PCM mono, 16 bits con signo, little-endian, 16 000 Hz.  
-**Entorno:** conda, nombre `tinyml`, Python 3.12.  
+**Entorno:** conda en PowerShell de Windows, nombre `tinyml`, Python 3.12. El ejecutable tiene que ser el de `envs\tinyml`.  
 **Clases iniciales:** palmas, golpes sobre una mesa y ruido ambiente.
 
-El trabajo avanza por etapas. Cada etapa produce un resultado verificable. Una librería entra en el entorno si su salida es un archivo que [plan.md](plan.md) va a leer, o si queda marcada como herramienta solo de PC y el contrato que viaja es ese archivo.
+El trabajo avanza por etapas. Cada etapa produce un resultado verificable. Lo ya ejecutado se anota en [python/docs/avance.md](python/docs/avance.md). Una librería entra en el entorno si su salida es un archivo que [plan.md](plan.md) va a leer, o si queda marcada como herramienta solo de PC y el contrato que viaja es ese archivo.
 
 ---
 
@@ -50,7 +50,7 @@ Estos son los resultados que tienen que salir de Python con el formato indicado.
 
 | Resultado | Formato | Lo lee |
 | --- | --- | --- |
-| Entorno conda `tinyml` con Python 3.12, y las versiones de las librerías de la tabla | `python/docs/environment.md` | Etapa 0 de [plan.md](plan.md), como la mitad Python de `docs/environment.md` |
+| Entorno conda `tinyml`, Python 3.12 y la ruta del ejecutable | `python/docs/environment.md` | Etapa 0 de [plan.md](plan.md), como la mitad Python de `docs/environment.md` |
 | Audio de una toma | `.raw` PCM mono, int16, little-endian, 16 000 Hz, y el WAV equivalente | Etapas 2 y 3 de [plan.md](plan.md). El tamaño del bloque es `16000 * 2 * X` bytes, el mismo cálculo del búfer en PSRAM |
 | Comando de grabación | Layout escrito en `python/docs/command_layout.md` y volcado en una struct C empaquetada, little-endian, con anchos explícitos | Etapa 1 de [plan.md](plan.md): el parser UART usa esa struct |
 | Tomas y particiones | Grabaciones etiquetadas. Las ventanas de una misma toma quedan en una sola partición | Etapas 4 y 11 de [plan.md](plan.md) |
@@ -123,20 +123,28 @@ El criterio de salida es una comprobación sobre datos, con el script y el archi
 
 ### Etapa 0. Entorno y librerías
 
+**Terminal.** PowerShell de Windows. El prompt muestra `PS`. Estos comandos no van en la terminal de Ubuntu dentro de WSL: ahí el prompt es `root@...#`, `conda` no está instalado y la sintaxis `$env:` no existe.
+
 **Trabajo.**
 
-0. Crear el entorno conda `tinyml` con Python 3.12 y activarlo. Todo lo que sigue de esta copia corre dentro de ese entorno.
+0. Crear el entorno conda `tinyml` con Python 3.12 y comprobar que el `python` que corre es el de esa carpeta. En esta PC hay otros intérpretes (`C:\Program Files\Python310` y un Python 3.12 en AppData). `python --version` puede decir 3.12 y seguir siendo otro programa. La prueba es la ruta.
 
-```text
-conda create -n tinyml python=3.12
+```powershell
+conda create -n tinyml python=3.12 -y
 conda activate tinyml
-python --version
+python -c "import sys; print(sys.executable); print(sys.version)"
 ```
 
-`python --version` tiene que informar 3.12. Anotar en `python/docs/environment.md` el nombre del entorno, el gestor (conda) y la versión de Python.
+`sys.executable` tiene que terminar en `\envs\tinyml\python.exe` y `sys.version` tiene que empezar con `3.12`. Si la ruta es otra, este comando usa el intérprete del entorno sin depender del `PATH`:
 
-1. Instalar en `tinyml` NumPy, Matplotlib, SoundFile, SoundDevice, scikit-learn y TensorFlow. Fijar las versiones en `python/docs/environment.md`. Para cada librería, anotar la versión, el archivo que produce y la fila que le corresponde en la sección 2. En el mismo archivo, anotar el rol de ESP-IDF, FreeRTOS, `esp-dsp`, `esp-nn` y ESP-TFLite-Micro, con la versión en blanco hasta que la etapa 0 de [plan.md](plan.md) la complete.
-2. Comprobar que un script mínimo, ejecutado con el `python` de `tinyml`, lee un WAV y muestra su frecuencia de muestreo, el número de canales y la cantidad de muestras.
+```powershell
+conda run -n tinyml python -c "import sys; print(sys.executable); print(sys.version)"
+```
+
+Anotar en `python/docs/environment.md` el gestor (conda), el nombre `tinyml`, la versión de Python y la ruta completa de `sys.executable`.
+
+1. Una librería se instala cuando un script de una etapa posterior la usa. La versión queda fijada en `pruebas_py/requirements.txt` y se instala con `python -m pip install -r requirements.txt` desde `pruebas_py`. En ese momento se anota en `python/docs/environment.md` la versión, el archivo que produce y la fila de la sección 2. En el mismo archivo quedan ESP-IDF, FreeRTOS, `esp-dsp`, `esp-nn` y ESP-TFLite-Micro, con la versión en blanco hasta la etapa 0 de [plan.md](plan.md).
+2. Comprobar que un script mínimo, ejecutado con el `python.exe` de `envs\tinyml`, lee un WAV y muestra su frecuencia de muestreo, el número de canales y la cantidad de muestras. El módulo `wave` de la biblioteca estándar alcanza para esa lectura.
 
 **Teoría.**
 
@@ -145,7 +153,7 @@ python --version
 - Una ventana de audio es el ejemplo que ve el modelo. La grabación completa es la fuente de esas ventanas.
 - SoundDevice y Matplotlib no viajan al microcontrolador. Viajan el `.raw` y el criterio con el que la toma fue aceptada.
 
-**Criterio de salida.** Con `tinyml` activado, `python --version` informa 3.12 y el script lee un WAV. `python/docs/environment.md` tiene el nombre del entorno, Python 3.12 y las versiones y los roles de las librerías.
+**Criterio de salida.** `sys.executable` termina en `\envs\tinyml\python.exe`, la versión empieza con 3.12 y el script lee un WAV con ese ejecutable. `python/docs/environment.md` tiene el nombre del entorno, la ruta y Python 3.12. El tono generado queda anotado en [python/docs/avance.md](python/docs/avance.md).
 
 ### Etapa 1. Comando y captura
 
@@ -343,7 +351,7 @@ python/
 
 | Decisión | Cuándo | Mientras tanto |
 | --- | --- | --- |
-| Intérprete de esta copia | Etapa 0, paso 0 | Conda, entorno `tinyml`, Python 3.12 |
+| Intérprete de esta copia | Etapa 0, paso 0 | PowerShell de Windows. Conda, entorno `tinyml`, Python 3.12, ejecutable en `envs\tinyml` |
 | Versiones y rol de cada librería | Etapa 0 | La sección 2 es la lista. Una librería nueva se instala en `tinyml` y se agrega ahí antes de usarla |
 | Layout del comando y duración de una toma | Etapa 1 | El PCM ya es mono, int16, little-endian, 16 000 Hz |
 | Conjunto de clases | Etapa 3 | Palmas, golpe de mesa, ruido ambiente |
